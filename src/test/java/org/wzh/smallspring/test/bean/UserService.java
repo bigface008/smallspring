@@ -14,8 +14,9 @@ public class UserService {
 //        this.name = name;
 //    }
 
-    public void queryUserInfo() {
-        System.out.println("Query User Info " + userDao.queryUserName(uid));
+    public String queryUserInfo() {
+//        System.out.println("Query User Info " + userDao.queryUserName(uid));
+        return userDao.queryUserName(uid);
     }
 
     public String getUid() {
