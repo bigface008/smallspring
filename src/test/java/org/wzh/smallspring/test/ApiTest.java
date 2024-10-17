@@ -14,16 +14,37 @@ import org.wzh.smallspring.beans.factory.config.BeanReference;
 import org.wzh.smallspring.beans.factory.support.BeanDefinitionRegistry;
 import org.wzh.smallspring.beans.factory.support.DefaultListableBeanFactory;
 import org.wzh.smallspring.beans.factory.xml.XmlBeanDefinitionReader;
+import org.wzh.smallspring.context.support.ClassPathXmlApplicationContext;
 import org.wzh.smallspring.core.io.DefaultResourceLoader;
 import org.wzh.smallspring.core.io.Resource;
 import org.wzh.smallspring.test.bean.UserDao;
 import org.wzh.smallspring.test.bean.UserService;
+import org.wzh.smallspring.test.common.MyBeanFactoryPostProcessor;
+import org.wzh.smallspring.test.common.MyBeanPostProcessor;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 
 public class ApiTest {
+
+    @Test
+    public void test_BeanFactoryPostProcessorAndBeanPostProcessor() {
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+
+        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
+        reader.loadBeanDefinitions("classpath:spring.xml");
+
+        MyBeanFactoryPostProcessor beanFactoryPostProcessor = new MyBeanFactoryPostProcessor();
+        beanFactoryPostProcessor.postProcessBeanFactory(beanFactory);
+
+        MyBeanPostProcessor beanPostProcessor = new MyBeanPostProcessor();
+        beanFactory.addBeanPostProcessor(beanPostProcessor);
+
+        UserService userService = beanFactory.getBean("userService", UserService.class);
+        String result = userService.queryUserInfo();
+        System.out.println("Test Result: " + result);
+    }
 
     @Test
     public void test_BeanFactory() {
@@ -112,12 +133,9 @@ public class ApiTest {
 
     @Test
     public void test_xml() {
-        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:springPostProcessor.xml");
 
-        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
-        reader.loadBeanDefinitions("classpath:spring.xml");
-
-        UserService userService = beanFactory.getBean("userService", UserService.class);
+        UserService userService = applicationContext.getBean("userService", UserService.class);
         String result = userService.queryUserInfo();
         System.out.println("Test Result: " + result);
     }

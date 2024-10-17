@@ -3,8 +3,15 @@ package org.wzh.smallspring.beans.factory.support;
 import org.wzh.smallspring.beans.BeansException;
 import org.wzh.smallspring.beans.factory.BeanFactory;
 import org.wzh.smallspring.beans.factory.config.BeanDefinition;
+import org.wzh.smallspring.beans.factory.config.BeanPostProcessor;
+import org.wzh.smallspring.beans.factory.config.ConfigurableBeanFactory;
 
-public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory {
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory {
+
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
     @Override
     public Object getBean(String name) throws BeansException {
@@ -29,6 +36,16 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
 
         BeanDefinition beanDefinition = getBeanDefinition(name);
         return (T) createBean(name, beanDefinition, args);
+    }
+
+    public List<BeanPostProcessor> getBeanPostProcessors() {
+        return this.beanPostProcessors;
+    }
+
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        this.beanPostProcessors.remove(beanPostProcessor);
+        this.beanPostProcessors.add(beanPostProcessor);
     }
 
     protected abstract BeanDefinition getBeanDefinition(String beanName) throws BeansException;
